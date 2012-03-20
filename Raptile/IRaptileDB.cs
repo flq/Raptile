@@ -6,5 +6,6 @@ namespace Raptile
     {
         void Set(T key, byte[] val);
         bool Get(T key, out byte[] val);
+        long Count { get; }
     }
 }

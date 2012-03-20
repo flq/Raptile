@@ -98,19 +98,12 @@ namespace Raptile.Indices
             }
         }
 
-        public int Count(bool includeDuplicates)
+        public int Count
         {
-            int i = 0;
-            foreach (var k in _pageList)
+            get
             {
-                i += k.Value.UniqueCount;
-                if (includeDuplicates)
-                {
-                    // FEATURE : count duplicates
-                }
+                return _pageList.Sum(k => k.Value.UniqueCount);
             }
-
-            return i;
         }
 
         public int GetLastIndexedRecordNumber()
@@ -219,20 +212,6 @@ namespace Raptile.Indices
             }
 
             return list;
-        }
-
-        public IEnumerable<int> GetDuplicates(T key)
-        {
-            PageInfo pi;
-            Page<T> page = LoadPage(key, out pi);
-            KeyInfo ki;
-            bool ret = page.tree.TryGetValue(key, out ki);
-            if (ret)
-                // get duplicates
-                if (ki.DuplicateBitmapNumber != -1)
-                    return _index.GetDuplicatesRecordNumbers(ki.DuplicateBitmapNumber);
-
-            return new List<int>();
         }
 
         public void SaveLastRecordNumber(int recnum)

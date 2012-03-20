@@ -64,12 +64,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Basic_objectstore_usage.cs" />
+    <Compile Include="ObjectStore\Basic_objectstore_usage.cs" />
     <Compile Include="Contexts\Foo.cs" />
     <Compile Include="Contexts\IndexFileTestContext.cs" />
     <Compile Include="Contexts\IntegrationContext.cs" />
     <Compile Include="Contexts\ServiceStackSerializer.cs" />
     <Compile Include="Index\Index_file_basic_usage.cs" />
+    <Compile Include="ObjectStore\Many_objects_scenario.cs" />
     <Compile Include="Storage\long_storage_key.cs" />
     <Compile Include="MurmurHashTests.cs" />
     <Compile Include="Contexts\StorageFileTestContext.cs" />

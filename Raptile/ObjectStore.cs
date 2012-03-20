@@ -6,6 +6,7 @@ namespace Raptile
     {
         T Get<T>(K key);
         void Set(K key, object obj);
+        long Count { get; }
     }
 
     public interface ISerializer
@@ -37,6 +38,11 @@ namespace Raptile
         {
             var bytes = _serializer.Serialize(obj);
             _db.Set(key, bytes);
+        }
+
+        public long Count
+        {
+            get { return _db.Count; }
         }
 
         public void Dispose()

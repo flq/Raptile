@@ -10,6 +10,7 @@ namespace Raptile.Tests
 
         public IntegrationContext()
         {
+            Global.PageItemCount = 1000;
             Fs = new InMemoryFileSystem();
             Raptile.FileSystem = Fs;
         }

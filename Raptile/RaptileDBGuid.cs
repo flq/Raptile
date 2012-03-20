@@ -36,38 +36,14 @@ namespace Raptile
             {
                 // unpack data
                 byte[] g;
-                if (val.UnpackData(out val, out g))
-                {
-                    if (Converter.CompareMemCmp(bkey, g) != 0)
-                    {
-                        // if data not equal check duplicates (hash conflict)
-                        var ints = new List<int>(_db.GetDuplicates(hc));
-                        ints.Reverse();
-                        foreach (int i in ints)
-                        {
-                            byte[] bb = _db.FetchRecordBytes(i);
-                            if (bb.UnpackData(out val, out g))
-                            {
-                                if (Converter.CompareMemCmp(bkey, g) == 0)
-                                    return true;
-                            }
-                        }
-                        return false;
-                    }
-                    return true;
-                }
+                return val.UnpackData(out val, out g);
             }
             return false;
         }
 
-        public long Count(bool includeDuplicates)
+        public long Count
         {
-            return _db.Count(includeDuplicates);
-        }
-
-        public void Shutdown()
-        {
-            _db.Shutdown();
+            get { return _db.Count; }
         }
 
         public void Dispose()

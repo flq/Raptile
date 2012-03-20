@@ -33,7 +33,7 @@ namespace Raptile
 
             _storageFile = new StorageFile<T>(fileSystem.GetFile(dbFile), fileSystem.GetFile(recFile), _maxKeySize);
 
-            _log.Debug("Current Count = " + Count(false).ToString("#,0"));
+            _log.Debug("Current Count = " + Count.ToString("#,0"));
 
             CheckIndexState();
 
@@ -43,12 +43,6 @@ namespace Raptile
             _savetimer.Interval = Global.SaveTimerSeconds * 1000;
             _savetimer.AutoReset = true;
             _savetimer.Start();
-        }
-
-        public IEnumerable<int> GetDuplicates(T key)
-        {
-            // get duplicates from index
-            return _index.GetDuplicates(key);
         }
 
         public byte[] FetchRecordBytes(int record)
@@ -77,9 +71,9 @@ namespace Raptile
             return _index.RemoveKey(key);
         }
 
-        public long Count(bool includeDuplicates)
+        public long Count
         {
-            return _index.Count(includeDuplicates);
+            get { return _index.Count; }
         }
 
         public bool Get(T key, out byte[] val)
