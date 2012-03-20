@@ -13,7 +13,7 @@ namespace Raptile
             _db = new KeyStore<int>(fileSystem, settings);
         }
 
-        public void Set(Guid key, byte[] val)
+        public int Set(Guid key, byte[] val)
         {
             var bkey = key.ToByteArray();
             var hc = (int)Converter.MurMur.Hash(bkey);
@@ -22,7 +22,7 @@ namespace Raptile
             ms.Write(bkey, 0, bkey.Length);
             ms.Write(val, 0, val.Length);
 
-            _db.Set(hc, ms.ToArray());
+            return _db.Set(hc, ms.ToArray());
         }
 
         public bool Get(Guid key, out byte[] val)

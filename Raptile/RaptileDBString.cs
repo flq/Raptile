@@ -18,7 +18,7 @@ namespace Raptile
             Set(key, Encoding.Unicode.GetBytes(val));
         }
 
-        public void Set(string key, byte[] val)
+        public int Set(string key, byte[] val)
         {
             byte[] bkey = Encoding.Unicode.GetBytes(key);
             var hc = (int)Converter.MurMur.Hash(bkey);
@@ -27,19 +27,7 @@ namespace Raptile
             ms.Write(bkey, 0, bkey.Length);
             ms.Write(val, 0, val.Length);
 
-            _db.Set(hc, ms.ToArray());
-        }
-
-        public bool Get(string key, out string val)
-        {
-            val = null;
-            byte[] bval;
-            var b = Get(key, out bval);
-            if (b)
-            {
-                val = Encoding.Unicode.GetString(bval);
-            }
-            return b;
+            return _db.Set(hc, ms.ToArray());
         }
 
         public bool Get(string key, out byte[] val)

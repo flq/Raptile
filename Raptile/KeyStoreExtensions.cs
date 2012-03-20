@@ -16,7 +16,7 @@ namespace Raptile
             return Encoding.Unicode.GetString(b);
         }
 
-        internal static bool Get<T>(this KeyStore<T> store, T key, out string val) where T : IComparable<T>
+        internal static bool Get<T>(this IRaptileDB<T> store, T key, out string val) where T : IComparable<T>
         {
             byte[] b;
             val = "";

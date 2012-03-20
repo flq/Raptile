@@ -14,7 +14,7 @@ namespace Raptile
         private StorageFile<T> _storageFile;
         private MGIndex<T> _index;
 
-        private readonly System.Timers.Timer _savetimer;
+        private readonly System.Timers.Timer _savetimer = new System.Timers.Timer();
         private readonly object _lock = new object();
 
         public KeyStore(IFileSystem fileSystem, Settings settings)
@@ -33,12 +33,7 @@ namespace Raptile
 
             CheckIndexState();
 
-            _log.Debug("Starting save timer");
-            _savetimer = new System.Timers.Timer();
-            _savetimer.Elapsed += HandleSavetimerElapsed;
-            _savetimer.Interval = Defaults.SaveTimerSeconds * 1000;
-            _savetimer.AutoReset = true;
-            _savetimer.Start();
+            SetupTimer(settings);
         }
 
         public byte[] FetchRecordBytes(int record)
@@ -88,7 +83,7 @@ namespace Raptile
             }
         }
 
-        public void Set(T key, byte[] data)
+        public int Set(T key, byte[] data)
         {
             lock (_lock)
             {
@@ -96,6 +91,7 @@ namespace Raptile
                 var recno = _storageFile.WriteData(key, data, false);
                 // save to index
                 _index.Set(key, recno);
+                return recno;
             }
         }
 
@@ -151,6 +147,15 @@ namespace Raptile
                 }
                 _log.Debug("Rebuild index done.");
             }
+        }
+
+        private void SetupTimer(Settings settings)
+        {
+            _log.Debug("Starting save timer");
+            _savetimer.Elapsed += HandleSavetimerElapsed;
+            _savetimer.Interval = settings.AutoSaveTimespan.TotalMilliseconds;
+            _savetimer.AutoReset = true;
+            _savetimer.Start();
         }
 
         void HandleSavetimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
