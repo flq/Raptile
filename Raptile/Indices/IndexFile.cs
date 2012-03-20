@@ -59,10 +59,6 @@ namespace Raptile.Indices
                 CreateFileHeader(0);
             }
             CalculateLastPageNumber();
-
-            
-            // bitmap duplicates 
-            //_bitmap = new BitmapIndex(fs, file);
         }
 
         private void CalculateLastPageNumber()
@@ -128,27 +124,6 @@ namespace Raptile.Indices
             return _lastPageNumber++;
         }
 
-        private void SeekPage(int pnum)
-        {
-            long offset = _fileHeader.Length;
-            offset += (long)pnum * _pageLength;
-            if (offset > _fileStream.Length)
-                CreateBlankPages(pnum);
-
-            _fileStream.Seek(offset, SeekOrigin.Begin);
-        }
-
-        private void CreateBlankPages(int pnum)
-        {
-            // create space
-            var b = new byte[_pageLength];
-            _fileStream.Seek(0L, SeekOrigin.Current);
-            for (int i = pnum; i < _lastPageNumber; i++)
-                _fileStream.Write(b, 0, b.Length);
-
-            _fileStream.Flush();
-        }
-
         public void Shutdown()
         {
             _log.Info("Shutdown of IndexFile");
@@ -168,6 +143,27 @@ namespace Raptile.Indices
                 if (nextpage != -1)
                     pageListDiskPages.Add(nextpage);
             }
+        }
+
+        private void SeekPage(int pnum)
+        {
+            long offset = _fileHeader.Length;
+            offset += (long)pnum * _pageLength;
+            if (offset > _fileStream.Length)
+                CreateBlankPages(pnum);
+
+            _fileStream.Seek(offset, SeekOrigin.Begin);
+        }
+
+        private void CreateBlankPages(int pnum)
+        {
+            // create space
+            var b = new byte[_pageLength];
+            _fileStream.Seek(0L, SeekOrigin.Current);
+            for (int i = pnum; i < _lastPageNumber; i++)
+                _fileStream.Write(b, 0, b.Length);
+
+            _fileStream.Flush();
         }
 
         private int LoadPageListData(int page, IDictionary<K, PageInfo> pageList)
@@ -245,7 +241,7 @@ namespace Raptile.Indices
         public Page<K> LoadPageFromPageNumber(int number)
         {
             SeekPage(number);
-            byte[] b = new byte[_pageLength];
+            var b = new byte[_pageLength];
             _fileStream.Read(b, 0, _pageLength);
 
             if (b[0] == _blockHeader[0] && b[1] == _blockHeader[1] && b[2] == _blockHeader[2] && b[3] == _blockHeader[3])

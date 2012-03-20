@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
 using OpenFileSystem.IO;
 using Raptile.DataTypes;
 
@@ -90,17 +91,17 @@ namespace Raptile.Storage
         public int WriteData(T key, byte[] data, bool deleted)
         {
             byte[] k = _byteReader.GetBytes(key);
-            int kl = k.Length;
+            int keyLength = k.Length;
 
             // seek end of file
             long offset = _lastWriteOffset;
-            byte[] hdr = CreateRowHeader(kl, (data==null?0:data.Length));
+            byte[] header = CreateRowHeader(keyLength, (data==null?0:data.Length));
             if (deleted)
-                hdr[(int)HdrPos.Flags] = 1;
+                header[(int)HdrPos.Flags] = 1;
             // write header info
-            _writefile.Write(hdr, 0, hdr.Length);
+            _writefile.Write(header, 0, header.Length);
             // write key
-            _writefile.Write(k, 0, kl);
+            _writefile.Write(k, 0, keyLength);
             if (data != null)
             {
                 // write data block
@@ -110,10 +111,9 @@ namespace Raptile.Storage
                 _lastWriteOffset += data.Length;
             }
             // update pointer
-            _lastWriteOffset += hdr.Length;
-            _lastWriteOffset += kl;
-            // return starting offset -> recno
-            int recno = _lastRecordNum++;
+            Interlocked.Add(ref _lastWriteOffset, header.Length);
+            Interlocked.Add(ref _lastWriteOffset, keyLength);
+            var recno = Interlocked.Increment(ref _lastRecordNum);
             _recordfile.Write(Converter.GetBytes(offset, false), 0, 8);
             if (Global.FlushStorageFileImmediatly)
                 _recordfile.Flush();
@@ -139,7 +139,6 @@ namespace Raptile.Storage
                        hdr[(int) HdrPos.KeyLen];
                 isdeleted = IsDeleted(hdr);
             }
-
             return next;
         }
 
