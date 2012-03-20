@@ -64,7 +64,7 @@ namespace Raptile
             }
         }
 
-        public bool RemoveKey(T key)
+        public bool Remove(T key)
         {
             // remove and store key in storage file
             _storageFile.WriteData(key, null, true);

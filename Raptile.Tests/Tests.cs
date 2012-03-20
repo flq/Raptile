@@ -46,7 +46,7 @@ namespace Raptile.Tests
                 found++;
             }
             Debug.WriteLine("Enumerate from key count = " + found);
-            db.RemoveKey(sk);
+            db.Remove(sk);
             db.Dispose();
         }
 
@@ -230,7 +230,7 @@ namespace Raptile.Tests
 
 
             rdb = new KeyStore<long>(_fileSystem, path);
-            rdb.RemoveKey(1);
+            rdb.Remove(1L);
             rdb.Dispose();
 
 
@@ -283,7 +283,7 @@ namespace Raptile.Tests
             }
             else
                 Debug.WriteLine("ALL OK");
-            rap.Shutdown();
+            rap.Dispose();
         }
     }
 }

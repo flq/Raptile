@@ -113,7 +113,8 @@ namespace Raptile.Storage
             // update pointer
             Interlocked.Add(ref _lastWriteOffset, header.Length);
             Interlocked.Add(ref _lastWriteOffset, keyLength);
-            var recno = Interlocked.Increment(ref _lastRecordNum);
+            var recno = _lastRecordNum;
+            Interlocked.Increment(ref _lastRecordNum);
             _recordfile.Write(Converter.GetBytes(offset, false), 0, 8);
             if (Global.FlushStorageFileImmediatly)
                 _recordfile.Flush();

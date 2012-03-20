@@ -49,9 +49,7 @@ namespace Raptile
 
         public bool Get(string key, out byte[] val)
         {
-            string str = (_caseSensitive ? key : key.ToLower());
-            byte[] bkey = Encoding.Unicode.GetBytes(str);
-            int hc = (int)Converter.MurMur.Hash(bkey);
+            int hc = GetKeyHash(key);
 
             if (_db.Get(hc, out val))
             {
@@ -62,19 +60,26 @@ namespace Raptile
             return false;
         }
 
+        public bool Remove(string key)
+        {
+            return _db.Remove(GetKeyHash(key));
+        }
+
         public long Count
         {
             get { return _db.Count; }
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             _db.Dispose();
         }
 
-        public void Dispose()
+        private int GetKeyHash(string key)
         {
-            _db.Dispose();
+            string str = (_caseSensitive ? key : key.ToLower());
+            byte[] bkey = Encoding.Unicode.GetBytes(str);
+            return (int)Converter.MurMur.Hash(bkey);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using OpenFileSystem.IO;
 using Path = OpenFileSystem.IO.Path;
@@ -29,8 +28,7 @@ namespace Raptile
 
         public bool Get(Guid key, out byte[] val)
         {
-            byte[] bkey = key.ToByteArray();
-            var hc = (int)Converter.MurMur.Hash(bkey);
+            var hc = GetHash(key);
 
             if (_db.Get(hc, out val))
             {
@@ -41,6 +39,11 @@ namespace Raptile
             return false;
         }
 
+        public bool Remove(Guid key)
+        {
+            return _db.Remove(GetHash(key));
+        }
+
         public long Count
         {
             get { return _db.Count; }
@@ -49,6 +52,12 @@ namespace Raptile
         public void Dispose()
         {
             _db.Dispose();
+        }
+
+        private static int GetHash(Guid key)
+        {
+            byte[] bkey = key.ToByteArray();
+            return (int)Converter.MurMur.Hash(bkey);
         }
     }
 }
