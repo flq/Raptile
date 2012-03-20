@@ -55,12 +55,12 @@ namespace Raptile
             return _storageFile.Traverse();
         }
 
-        public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey)//, bool includeDuplicates, int start, int count)
+        public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey)
         {
             lock (_lock)
             {
                 // generate a list from the start key using forward only pages
-                return _index.Enumerate(fromkey);//, includeDuplicates, start, count);
+                return _index.Enumerate(fromkey);
             }
         }
 

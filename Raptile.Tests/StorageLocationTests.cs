@@ -28,13 +28,11 @@ namespace Raptile.Tests
         {
             var files = _dir.Files().ToList();
             files.ForEach(f => Debug.WriteLine(f.Name));
-            files.Should().HaveCount(5);
+            files.Should().HaveCount(3);
         }
 
         [Test]
         [TestCase("raptile.mgidx")]
-        [TestCase("raptile.mgbmr")]
-        [TestCase("raptile.mgbmp")]
         [TestCase("raptile.mgdat")]
         [TestCase("raptile.mgrec")]
         public void all_files_defined(string name)

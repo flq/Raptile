@@ -160,7 +160,6 @@ namespace Raptile.Indices
                     _index.SavePage(p);
                     p.isDirty = false;
                 }
-                _index.BitmapFlush();
             }
             _log.Debug("index persisted");
         }

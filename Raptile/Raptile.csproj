@@ -112,11 +112,9 @@
     <Compile Include="DbFiles.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Converter.cs" />
-    <Compile Include="Indices\BitmapIndex.cs" />
     <Compile Include="Indices\IndexFile.cs" />
     <Compile Include="Indices\MGIndex.cs" />
     <Compile Include="Indices\MurMurHash2.cs" />
-    <Compile Include="Indices\WAHBitarray2.cs" />
     <Compile Include="IRaptileDB.cs" />
     <Compile Include="KeyStore.cs" />
     <Compile Include="KeyStoreExtensions.cs" />

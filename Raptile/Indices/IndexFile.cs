@@ -7,7 +7,7 @@ using Path = OpenFileSystem.IO.Path;
 
 namespace Raptile.Indices
 {
-    internal class IndexFile<T>
+    internal class IndexFile<K>
     {
         private byte[] _fileHeader = new byte[] {
             (byte)'M', (byte)'G', (byte)'I',
@@ -26,19 +26,18 @@ namespace Raptile.Indices
             0,0,0,0          // 11 = [right page number]   -- /[next page number]
         };
 
-        private readonly ILog _log = LogManager.GetLogger(typeof(IndexFile<T>));
+        private readonly ILog _log = LogManager.GetLogger(typeof(IndexFile<K>));
         readonly Stream _fileStream;
         private byte _maxKeySize;
         private ushort _pageNodeCount = 5000;
         private int _lastPageNumber = 1; // 0 = page list
         private readonly int _pageLength;
         private readonly int _rowSize;
-        private readonly BitmapIndex _bitmap;
-        readonly IGetBytes<T> _byteReader;
+        readonly IGetBytes<K> _byteReader;
 
         public IndexFile(IFileSystem fs, Path file, byte maxKeySize, ushort pageNodeCount)
         {
-            _byteReader = RdbDataType<T>.ByteHandler();
+            _byteReader = RdbDataType<K>.ByteHandler();
             _maxKeySize = maxKeySize;
             _pageNodeCount = pageNodeCount;
             _rowSize = (_maxKeySize + 1 + 4 + 4);
@@ -63,7 +62,7 @@ namespace Raptile.Indices
 
             
             // bitmap duplicates 
-            _bitmap = new BitmapIndex(fs, file);
+            //_bitmap = new BitmapIndex(fs, file);
         }
 
         private void CalculateLastPageNumber()
@@ -155,11 +154,9 @@ namespace Raptile.Indices
             _log.Info("Shutdown of IndexFile");
             if (_fileStream != null)
                 _fileStream.Dispose();
-            _bitmap.Commit(Global.FreeBitmapMemoryOnSave);
-            _bitmap.Shutdown();
         }
 
-        public void GetPageList(List<int> pageListDiskPages, SortedList<T, PageInfo> pageList, out int lastIndexedRow)
+        public void GetPageList(List<int> pageListDiskPages, SortedList<K, PageInfo> pageList, out int lastIndexedRow)
         {
             lastIndexedRow = Converter.ToInt32(_fileHeader, 11);
             // load page list
@@ -173,7 +170,7 @@ namespace Raptile.Indices
             }
         }
 
-        private int LoadPageListData(int page, IDictionary<T, PageInfo> pageList)
+        private int LoadPageListData(int page, IDictionary<K, PageInfo> pageList)
         {
             // load page list data
             int nextpage;
@@ -193,7 +190,7 @@ namespace Raptile.Indices
                 {
                     int idx = index + _rowSize * i;
                     byte ks = b[idx];
-                    T key = _byteReader.GetObject(b, idx + 1, ks);
+                    K key = _byteReader.GetObject(b, idx + 1, ks);
                     int pagenum = Converter.ToInt32(b, idx + 1 + _maxKeySize);
                     // add counts
                     int unique = Converter.ToInt32(b, idx + 1 + _maxKeySize + 4);
@@ -207,7 +204,7 @@ namespace Raptile.Indices
             return nextpage;
         }
 
-        internal void SavePage(Page<T> node)
+        internal void SavePage(Page<K> node)
         {
             int pnum = node.DiskPageNumber;
             if (pnum > _lastPageNumber)
@@ -221,7 +218,7 @@ namespace Raptile.Indices
             var index = blockheader.Length;
             var i = 0;
             byte[] b;
-            T[] keys = node.tree.Keys();
+            K[] keys = node.tree.Keys();
             // node children
             foreach (var kp in keys)
             {
@@ -245,7 +242,7 @@ namespace Raptile.Indices
             _fileStream.Write(page, 0, page.Length);
         }
 
-        public Page<T> LoadPageFromPageNumber(int number)
+        public Page<K> LoadPageFromPageNumber(int number)
         {
             SeekPage(number);
             byte[] b = new byte[_pageLength];
@@ -254,7 +251,7 @@ namespace Raptile.Indices
             if (b[0] == _blockHeader[0] && b[1] == _blockHeader[1] && b[2] == _blockHeader[2] && b[3] == _blockHeader[3])
             {
                 // create node here
-                var page = new Page<T>();
+                var page = new Page<K>();
 
                 short count = Converter.ToInt16(b, 5);
                 if (count > _pageNodeCount)
@@ -267,7 +264,7 @@ namespace Raptile.Indices
                 {
                     int idx = index + _rowSize * i;
                     byte ks = b[idx];
-                    T key = _byteReader.GetObject(b, idx + 1, ks);
+                    K key = _byteReader.GetObject(b, idx + 1, ks);
                     int offset = Converter.ToInt32(b, idx + 1 + _maxKeySize);
                     int duppage = Converter.ToInt32(b, idx + 1 + _maxKeySize + 4);
                     page.tree.Add(key, new KeyInfo(offset, duppage));
@@ -278,7 +275,7 @@ namespace Raptile.Indices
         }
 
 
-        internal void SavePageList(SortedList<T, PageInfo> pages, List<int> diskpages)
+        internal void SavePageList(SortedList<K, PageInfo> pages, List<int> diskpages)
         {
             // save page list
             int c = (pages.Count / Global.PageItemCount) + 1;
@@ -310,7 +307,7 @@ namespace Raptile.Indices
             _fileStream.Write(lastpage, 0, lastpage.Length);
         }
 
-        private void CreatePageListData(SortedList<T, PageInfo> pages, int i, byte[] page, int index, int j)
+        private void CreatePageListData(SortedList<K, PageInfo> pages, int i, byte[] page, int index, int j)
         {
             int idx = index + _rowSize * j;
             // key bytes
@@ -327,19 +324,12 @@ namespace Raptile.Indices
             // add counts 
             b = Converter.GetBytes(pages.Values[i + j].UniqueCount, false);
             Buffer.BlockCopy(b, 0, page, idx + 1 + _maxKeySize + 4, b.Length);
-            // FEATURE : add dup counts
         }
 
         internal void SaveLastRecordNumber(int recnum)
         {
             // save the last record number indexed to the header
             CreateFileHeader(recnum);
-        }
-
-        internal void BitmapFlush()
-        {
-            _bitmap.Commit(Global.FreeBitmapMemoryOnSave);
-            _bitmap.Flush();
         }
     }
 }
