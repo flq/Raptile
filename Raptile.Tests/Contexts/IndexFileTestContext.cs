@@ -20,7 +20,7 @@ namespace Raptile.Tests
 
         private void CreateIndex()
         {
-            _index = new MGIndex<string>(_fs, new Path(@"c:\index.mgidx"), KeyLength, 300, false);
+            _index = new MGIndex<string>(_fs, new Path(@"c:\index.mgidx"), KeyLength, 300);
         }
 
         protected void SetKeyForRecordNumber(string key, int recordNumber)

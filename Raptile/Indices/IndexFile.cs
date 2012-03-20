@@ -53,34 +53,24 @@ namespace Raptile.Indices
                 ReadFileHeader();
                 // compute last page number from file length
                 _pageLength = (_blockHeader.Length + _rowSize * (_pageNodeCount));
-                _lastPageNumber = (int)((_fileStream.Length - _fileHeader.Length) / _pageLength);
             }
             else
             {
                 _pageLength = (_blockHeader.Length + _rowSize * (_pageNodeCount));
                 CreateFileHeader(0);
-                _lastPageNumber = (int)((_fileStream.Length - _fileHeader.Length) / _pageLength);
             }
+            CalculateLastPageNumber();
 
-            if (_lastPageNumber == 0)
-                _lastPageNumber = 1;
+            
             // bitmap duplicates 
             _bitmap = new BitmapIndex(fs, file);
         }
 
-        public void SetBitmapDuplicate(int bitmaprec, int rec)
+        private void CalculateLastPageNumber()
         {
-            _bitmap.SetDuplicate(bitmaprec, rec);
-        }
-
-        public int GetBitmapDuplaicateFreeRecordNumber()
-        {
-            return _bitmap.GetFreeRecordNumber();
-        }
-
-        public IEnumerable<int> GetDuplicatesRecordNumbers(int recno)
-        {
-            return _bitmap.GetBitmapNoCache(recno).GetBitIndexes(true);
+            _lastPageNumber = (int)((_fileStream.Length - _fileHeader.Length) / _pageLength);
+            if (_lastPageNumber == 0)
+                _lastPageNumber = 1;
         }
 
         private byte[] CreateBlockHeader(byte type, ushort itemcount, int rightpagenumber)

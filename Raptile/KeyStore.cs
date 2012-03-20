@@ -17,19 +17,19 @@ namespace Raptile
         private readonly System.Timers.Timer _savetimer;
         private readonly object _lock = new object();
 
-        public KeyStore(IFileSystem fileSystem, Path file) : this(fileSystem, file, Global.DefaultStringKeySize, false)
+        public KeyStore(IFileSystem fileSystem, Path file) : this(fileSystem, file, Global.DefaultStringKeySize)
         {
             
         }
 
-        public KeyStore(IFileSystem fileSystem, Path file, byte maxKeySize, bool allowDuplicateKeys)
+        public KeyStore(IFileSystem fileSystem, Path file, byte maxKeySize)
         {   
             _maxKeySize = RdbDataType<T>.GetByteSize(maxKeySize);
 
             var dbFile = file.ChangeExtension(DbFiles.DatExtension);
             var recFile = file.ChangeExtension(DbFiles.RecExtension);
 
-            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Global.PageItemCount, allowDuplicateKeys);
+            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Global.PageItemCount);
 
             _storageFile = new StorageFile<T>(fileSystem.GetFile(dbFile), fileSystem.GetFile(recFile), _maxKeySize);
 

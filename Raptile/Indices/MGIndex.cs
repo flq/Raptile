@@ -74,13 +74,11 @@ namespace Raptile.Indices
         private readonly SafeDictionary<int, Page<T>> _cache = new SafeDictionary<int, Page<T>>();
         private readonly List<int> _pageListDiskPages = new List<int>();
         private readonly IndexFile<T> _index;
-        private readonly bool _allowDuplicates = true;
         private double _totalsplits;
         private int _lastIndexedRecordNumber;
 
-        public MGIndex(IFileSystem fs, Path path, byte keysize, ushort maxcount, bool allowdups)
+        public MGIndex(IFileSystem fs, Path path, byte keysize, ushort maxcount)
         {
-            _allowDuplicates = allowdups;
             _index = new IndexFile<T>(fs, path, keysize, maxcount);
 
             // load page list
@@ -119,13 +117,6 @@ namespace Raptile.Indices
             KeyInfo ki;
             if (page.tree.TryGetValue(key, out ki))
             {
-                // item exists
-                if (_allowDuplicates)
-                {
-                    SaveDuplicate(key, ref ki);
-                    // set current record in the bitmap also
-                    _index.SetBitmapDuplicate(ki.DuplicateBitmapNumber, recordNumber);
-                }
                 ki.RecordNumber = recordNumber;
                 page.tree[key] = ki; // structs need resetting
             }
@@ -133,11 +124,6 @@ namespace Raptile.Indices
             {
                 // new item 
                 ki = new KeyInfo(recordNumber);
-                if (_allowDuplicates)
-                {          
-                    // set current record in the bitmap also
-                    SaveDuplicate(key, ref ki);
-                }
                 pi.UniqueCount++;
                 page.tree.Add(key, ki);
             }
@@ -188,7 +174,6 @@ namespace Raptile.Indices
             _index.Shutdown();
         }
 
-        // FEATURE : bool includeDuplices, int start, int count)
         public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey)
         {
             var list = new List<KeyValuePair<T, int>>();
@@ -303,14 +288,6 @@ namespace Raptile.Indices
                 _cache.Add(pagenum, page);
             }
             return page;
-        }
-
-        private void SaveDuplicate(T key, ref KeyInfo ki)
-        {
-            if (ki.DuplicateBitmapNumber == -1)
-                ki.DuplicateBitmapNumber = _index.GetBitmapDuplaicateFreeRecordNumber();
-
-            _index.SetBitmapDuplicate(ki.DuplicateBitmapNumber, ki.RecordNumber);
         }
 
         private int FindPageOrLowerPosition(T key, ref bool found)

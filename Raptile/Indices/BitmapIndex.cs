@@ -84,12 +84,6 @@ namespace Raptile.Indices
             }
         }
 
-        public void SetDuplicate(int bitmaprecno, int record)
-        {
-            var ba = GetBitmap(bitmaprecno);
-            ba.Set(record, true);
-        }
-
         public WAHBitArray GetBitmap(int recno)
         {
             return internalGetBitmap(recno, true);
