@@ -47,7 +47,7 @@ namespace Raptile.Tests
             }
             Debug.WriteLine("Enumerate from key count = " + found);
             db.RemoveKey(sk);
-            db.Shutdown();
+            db.Dispose();
         }
 
 
@@ -226,12 +226,12 @@ namespace Raptile.Tests
             var rdb = new KeyStore<long>(_fileSystem, path);
             rdb.Set(1, "a");
             rdb.Set(2, "b");
-            rdb.Shutdown();
+            rdb.Dispose();
 
 
             rdb = new KeyStore<long>(_fileSystem, path);
             rdb.RemoveKey(1);
-            rdb.Shutdown();
+            rdb.Dispose();
 
 
             rdb = new KeyStore<long>(_fileSystem, path);
@@ -249,7 +249,7 @@ namespace Raptile.Tests
             {
                 db.Set("asdfasd" + i, "" + i);
             }
-            db.Shutdown();
+            db.Dispose();
         }
 
         [Test]

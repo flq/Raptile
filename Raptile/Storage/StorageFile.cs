@@ -7,7 +7,7 @@ using Raptile.DataTypes;
 
 namespace Raptile.Storage
 {
-    internal class StorageFile<T>
+    internal class StorageFile<T> : IDisposable
     {
         private readonly IGetBytes<T> _byteReader;
         Stream _writefile;
@@ -192,7 +192,7 @@ namespace Raptile.Storage
             return data;
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             FlushClose(_readData);
             FlushClose(_readRec);
@@ -249,9 +249,9 @@ namespace Raptile.Storage
             st.Close();
         }
 
-        private static bool IsDeleted(byte[] hdr)
+        private static bool IsDeleted(IList<byte> hdr)
         {
-            return (hdr[(int)HdrPos.Flags] & (byte)1) > 0;
+            return (hdr[(int)HdrPos.Flags] & 1) > 0;
         }
     }
 }

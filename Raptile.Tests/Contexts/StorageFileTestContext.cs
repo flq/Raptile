@@ -54,7 +54,7 @@ namespace Raptile.Tests
 
         protected void ReloadStorage()
         {
-            _storage.Shutdown();
+            _storage.Dispose();
             CreateStorage();
         }
     }

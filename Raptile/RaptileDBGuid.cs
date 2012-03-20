@@ -48,7 +48,7 @@ namespace Raptile
 
         public void Dispose()
         {
-            _db.Shutdown();
+            _db.Dispose();
         }
     }
 }

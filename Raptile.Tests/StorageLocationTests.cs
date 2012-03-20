@@ -19,7 +19,7 @@ namespace Raptile.Tests
         {
             _fs = new InMemoryFileSystem();
             var ks = new KeyStore<string>(_fs, new Path(@"c:\db\raptile.db"));
-            ks.Shutdown();
+            ks.Dispose();
             _dir = _fs.GetDirectory(@"c:\db");
         }
 

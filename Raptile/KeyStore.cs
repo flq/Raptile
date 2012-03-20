@@ -103,23 +103,18 @@ namespace Raptile
             }
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             lock (_lock)
             {
-                if (_index != null)
-                    _log.Debug("Shutting down");
-                else
-                    return;
+                _log.Info("shutting down key Store...");
 
                 SaveLastRecord();
 
-                _index.Shutdown();
-                if (_storageFile != null)
-                    _storageFile.Shutdown();
+                _index.Dispose();
+                _storageFile.Dispose();
                 _index = null;
                 _storageFile = null;
-                _log.Debug("Shutting down log");
             }
         }
 
@@ -165,11 +160,6 @@ namespace Raptile
         void HandleSavetimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             _index.SaveIndex();
-        }
-
-        public void Dispose()
-        {
-            Shutdown();
         }
     }
 }

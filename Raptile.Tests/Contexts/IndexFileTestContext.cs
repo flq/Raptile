@@ -43,7 +43,7 @@ namespace Raptile.Tests
 
         protected void ReloadIndex()
         {
-            _index.Shutdown();
+            _index.Dispose();
             CreateIndex();
         }
     }

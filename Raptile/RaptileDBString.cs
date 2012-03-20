@@ -69,12 +69,12 @@ namespace Raptile
 
         public void Shutdown()
         {
-            _db.Shutdown();
+            _db.Dispose();
         }
 
         public void Dispose()
         {
-            _db.Shutdown();
+            _db.Dispose();
         }
     }
 }

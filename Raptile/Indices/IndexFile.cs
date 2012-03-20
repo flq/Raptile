@@ -7,7 +7,7 @@ using Path = OpenFileSystem.IO.Path;
 
 namespace Raptile.Indices
 {
-    internal class IndexFile<K>
+    internal class IndexFile<K> : IDisposable
     {
         private byte[] _fileHeader = new byte[] {
             (byte)'M', (byte)'G', (byte)'I',
@@ -124,7 +124,7 @@ namespace Raptile.Indices
             return _lastPageNumber++;
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             _log.Info("Shutdown of IndexFile");
             if (_fileStream != null)
@@ -208,17 +208,17 @@ namespace Raptile.Indices
 
             SeekPage(pnum);
             var page = new byte[_pageLength];
-            var blockheader = CreateBlockHeader(0, (ushort)node.tree.Count, node.RightPageNumber);
+            var blockheader = CreateBlockHeader(0, (ushort)node.Tree.Count, node.RightPageNumber);
             Buffer.BlockCopy(blockheader, 0, page, 0, blockheader.Length);
 
             var index = blockheader.Length;
             var i = 0;
             byte[] b;
-            K[] keys = node.tree.Keys();
+            K[] keys = node.Tree.Keys();
             // node children
             foreach (var kp in keys)
             {
-                var val = node.tree[kp];
+                var val = node.Tree[kp];
                 int idx = index + _rowSize * i++;
                 // key bytes
                 byte[] kk = _byteReader.GetBytes(kp);
@@ -263,7 +263,7 @@ namespace Raptile.Indices
                     K key = _byteReader.GetObject(b, idx + 1, ks);
                     int offset = Converter.ToInt32(b, idx + 1 + _maxKeySize);
                     int duppage = Converter.ToInt32(b, idx + 1 + _maxKeySize + 4);
-                    page.tree.Add(key, new KeyInfo(offset, duppage));
+                    page.Tree.Add(key, new KeyInfo(offset, duppage));
                 }
                 return page;
             }

@@ -6,67 +6,10 @@ using Raptile.DataTypes;
 
 namespace Raptile.Indices
 {
-    internal struct PageInfo
-    {
-        public PageInfo(int pagenum, int uniquecount)
-        {
-            PageNumber = pagenum;
-            UniqueCount = uniquecount;
-        }
-        public int PageNumber;
-        public int UniqueCount;
-    }
-
-    internal struct KeyInfo
-    {
-        public KeyInfo(int recnum)
-        {
-            RecordNumber = recnum;
-            DuplicateBitmapNumber = -1;
-        }
-        public KeyInfo(int recnum, int bitmaprec)
-        {
-            RecordNumber = recnum;
-            DuplicateBitmapNumber = bitmaprec;
-        }
-        public int RecordNumber;
-        public int DuplicateBitmapNumber;
-    }
-
-    internal class Page<T>
-    {
-        public Page()
-        {
-            DiskPageNumber = -1;
-            RightPageNumber = -1;
-            tree = new SafeDictionary<T, KeyInfo>(Global.PageItemCount);
-            isDirty = false;
-            FirstKey = default(T);
-        }
-        public int DiskPageNumber;
-        public int RightPageNumber;
-        public T FirstKey;
-        public bool isDirty;
-        public SafeDictionary<T, KeyInfo> tree;
-    }
-
-
-    public class Statistics
-    {
-        public int PageCount;
-        public double TotalSplitTime;
-        public double FillFactor;
-
-        public override string ToString()
-        {
-            return "Page Count = " + PageCount + ", Total Split Time = " + TotalSplitTime;
-        }
-    }
-
     /// <summary>
     /// http://www.codeproject.com/Articles/316816/RaptorDB-The-Key-Value-Store-V2
     /// </summary>
-    internal class MGIndex<T> where T : IComparable<T>
+    internal class MGIndex<T> : IDisposable where T : IComparable<T>
     {
         private readonly ILog _log = LogManager.GetLogger(typeof(MGIndex<T>));
         private readonly object _savelock = new object();
@@ -74,26 +17,18 @@ namespace Raptile.Indices
         private readonly SafeDictionary<int, Page<T>> _cache = new SafeDictionary<int, Page<T>>();
         private readonly List<int> _pageListDiskPages = new List<int>();
         private readonly IndexFile<T> _index;
+        
         private double _totalsplits;
         private int _lastIndexedRecordNumber;
 
         public MGIndex(IFileSystem fs, Path path, byte keysize, ushort maxcount)
         {
             _index = new IndexFile<T>(fs, path, keysize, maxcount);
-
-            // load page list
             _index.GetPageList(_pageListDiskPages, _pageList, out _lastIndexedRecordNumber);
-            if (_pageList.Count == 0)
-            {
-                var page = new Page<T>
-                               {
-                                   FirstKey = (T) RdbDataType<T>.GetEmpty(),
-                                   DiskPageNumber = _index.GetNewPageNumber(),
-                                   isDirty = true
-                               };
-                _pageList.Add(page.FirstKey, new PageInfo(page.DiskPageNumber, 0));
-                _cache.Add(page.DiskPageNumber, page);
-            }
+            
+            if (_pageList.Count != 0) return;
+            
+            CreateFirstPage();
         }
 
         public int Count
@@ -115,20 +50,20 @@ namespace Raptile.Indices
             Page<T> page = LoadPage(key, out pi);
 
             KeyInfo ki;
-            if (page.tree.TryGetValue(key, out ki))
+            if (page.Tree.TryGetValue(key, out ki))
             {
                 ki.RecordNumber = recordNumber;
-                page.tree[key] = ki; // structs need resetting
+                page.Tree[key] = ki; // structs need resetting
             }
             else
             {
                 // new item 
                 ki = new KeyInfo(recordNumber);
                 pi.UniqueCount++;
-                page.tree.Add(key, ki);
+                page.Tree.Add(key, ki);
             }
 
-            if (page.tree.Count > Global.PageItemCount)
+            if (page.Tree.Count > Global.PageItemCount)
                 SplitPage(page);
 
             _lastIndexedRecordNumber = recordNumber;
@@ -141,7 +76,7 @@ namespace Raptile.Indices
             PageInfo pi;
             Page<T> page = LoadPage(key, out pi);
             KeyInfo ki;
-            bool ret = page.tree.TryGetValue(key, out ki);
+            bool ret = page.Tree.TryGetValue(key, out ki);
             if (ret)
                 val = ki.RecordNumber;
             return ret;
@@ -164,13 +99,11 @@ namespace Raptile.Indices
             _log.Debug("index persisted");
         }
 
-        public void Shutdown()
+        public void Dispose()
         {
             SaveIndex();
-            // save page list
             _index.SavePageList(_pageList, _pageListDiskPages);
-            // shutdown
-            _index.Shutdown();
+            _index.Dispose();
         }
 
         public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey)
@@ -179,20 +112,20 @@ namespace Raptile.Indices
             // enumerate
             PageInfo pi;
             Page<T> page = LoadPage(fromkey, out pi);
-            T[] keys = page.tree.Keys();
+            T[] keys = page.Tree.Keys();
             Array.Sort(keys);
 
             int p = Array.BinarySearch(keys, fromkey);
             for (int i = p; i < keys.Length; i++)
-                list.Add(new KeyValuePair<T, int>(keys[i], page.tree[keys[i]].RecordNumber));
+                list.Add(new KeyValuePair<T, int>(keys[i], page.Tree[keys[i]].RecordNumber));
 
             while (page.RightPageNumber != -1)
             {
                 page = LoadPage(page.RightPageNumber);
-                keys = page.tree.Keys();
+                keys = page.Tree.Keys();
                 Array.Sort(keys);
 
-                list.AddRange(keys.Select(k => new KeyValuePair<T, int>(k, page.tree[k].RecordNumber)));
+                list.AddRange(keys.Select(k => new KeyValuePair<T, int>(k, page.Tree[k].RecordNumber)));
             }
 
             return list;
@@ -207,7 +140,7 @@ namespace Raptile.Indices
         {
             PageInfo pi;
             Page<T> page = LoadPage(key, out pi);
-            bool b = page.tree.Remove(key);
+            bool b = page.Tree.Remove(key);
             if (b)
                 page.isDirty = true;
             return b;
@@ -232,14 +165,14 @@ namespace Raptile.Indices
                               };
             page.RightPageNumber = newpage.DiskPageNumber;
             // get and sort keys
-            T[] keys = page.tree.Keys();
+            T[] keys = page.Tree.Keys();
             Array.Sort(keys);
             // copy data to new 
             for (int i = keys.Length / 2; i < keys.Length; i++)
             {
-                newpage.tree.Add(keys[i], page.tree[keys[i]]);
+                newpage.Tree.Add(keys[i], page.Tree[keys[i]]);
                 // remove from old page
-                page.tree.Remove(keys[i]);
+                page.Tree.Remove(keys[i]);
             }
             // set the first key
             newpage.FirstKey = keys[keys.Length / 2];
@@ -247,10 +180,10 @@ namespace Raptile.Indices
             _pageList.Remove(page.FirstKey);
             _pageList.Remove(keys[0]);
             // dup counts
-            _pageList.Add(keys[0], new PageInfo(page.DiskPageNumber, page.tree.Count));
+            _pageList.Add(keys[0], new PageInfo(page.DiskPageNumber, page.Tree.Count));
             page.FirstKey = keys[0];
             // FEATURE : dup counts
-            _pageList.Add(newpage.FirstKey, new PageInfo(newpage.DiskPageNumber, newpage.tree.Count));
+            _pageList.Add(newpage.FirstKey, new PageInfo(newpage.DiskPageNumber, newpage.Tree.Count));
             _cache.Add(newpage.DiskPageNumber, newpage);
 
             _totalsplits += FastDateTime.Now.Subtract(dt).TotalSeconds;
@@ -289,6 +222,18 @@ namespace Raptile.Indices
             return page;
         }
 
+        private void CreateFirstPage()
+        {
+            var page = new Page<T>
+                           {
+                               FirstKey = (T) RdbDataType<T>.GetEmpty(),
+                               DiskPageNumber = _index.GetNewPageNumber(),
+                               isDirty = true
+                           };
+            _pageList.Add(page.FirstKey, new PageInfo(page.DiskPageNumber, 0));
+            _cache.Add(page.DiskPageNumber, page);
+        }
+
         private int FindPageOrLowerPosition(T key, ref bool found)
         {
             if (_pageList.Count == 0)
@@ -319,6 +264,18 @@ namespace Raptile.Indices
             }
 
             return lastlower;
+        }
+    }
+
+    public class Statistics
+    {
+        public int PageCount;
+        public double TotalSplitTime;
+        public double FillFactor;
+
+        public override string ToString()
+        {
+            return "Page Count = " + PageCount + ", Total Split Time = " + TotalSplitTime;
         }
     }
 }
