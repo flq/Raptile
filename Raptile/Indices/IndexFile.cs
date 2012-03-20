@@ -274,7 +274,7 @@ namespace Raptile.Indices
         internal void SavePageList(SortedList<K, PageInfo> pages, List<int> diskpages)
         {
             // save page list
-            int c = (pages.Count / Global.PageItemCount) + 1;
+            int c = (pages.Count / Defaults.PageItemCount) + 1;
             // allocate pages needed 
             while (c > diskpages.Count)
                 diskpages.Add(GetNewPageNumber());
@@ -282,16 +282,16 @@ namespace Raptile.Indices
             for (int i = 0; i < (diskpages.Count - 1); i++)
             {
                 var page = new byte[_pageLength];
-                byte[] block = CreateBlockHeader(1, Global.PageItemCount, diskpages[i + 1]);
+                byte[] block = CreateBlockHeader(1, Defaults.PageItemCount, diskpages[i + 1]);
                 Buffer.BlockCopy(block, 0, page, 0, block.Length);
-                for (int j = 0; j < Global.PageItemCount; j++)
+                for (int j = 0; j < Defaults.PageItemCount; j++)
                 {
                     CreatePageListData(pages, i, page, block.Length, j);
                 }
                 SeekPage(diskpages[i]);
                 _fileStream.Write(page, 0, page.Length);
             }
-            c = pages.Count % Global.PageItemCount;
+            c = pages.Count % Defaults.PageItemCount;
             byte[] lastblock = CreateBlockHeader(1, (ushort)c, -1);
             var lastpage = new byte[_pageLength];
             Buffer.BlockCopy(lastblock, 0, lastpage, 0, lastblock.Length);

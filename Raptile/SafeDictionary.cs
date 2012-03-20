@@ -5,72 +5,72 @@ namespace Raptile
 {
     internal class SafeDictionary<TKey, TValue>
     {
-        private readonly object _Padlock = new object();
-        private readonly Dictionary<TKey, TValue> _Dictionary = null;
+        private readonly object _padlock = new object();
+        private readonly Dictionary<TKey, TValue> _dictionary;
 
         public SafeDictionary(int capacity)
         {
-            _Dictionary = new Dictionary<TKey, TValue>(capacity);
+            _dictionary = new Dictionary<TKey, TValue>(capacity);
         }
 
         public SafeDictionary()
         {
-            _Dictionary = new Dictionary<TKey, TValue>();
+            _dictionary = new Dictionary<TKey, TValue>();
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return _Dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value);
         }
 
         public TValue this[TKey key]
         {
             get
             {
-                return _Dictionary[key];
+                return _dictionary[key];
             }
             set
             {
-                lock (_Padlock)
-                    _Dictionary[key] = value;
+                lock (_padlock)
+                    _dictionary[key] = value;
             }
         }
 
         public int Count
         {
-            get { return _Dictionary.Count; }
+            get { return _dictionary.Count; }
         }
 
         public ICollection<KeyValuePair<TKey, TValue>> GetList()
         {
-            return (ICollection<KeyValuePair<TKey, TValue>>)_Dictionary;
+            return _dictionary;
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return ((ICollection<KeyValuePair<TKey, TValue>>)_Dictionary).GetEnumerator();
+            return ((ICollection<KeyValuePair<TKey, TValue>>)_dictionary).GetEnumerator();
         }
 
         public void Add(TKey key, TValue value)
         {
-            lock (_Padlock)
-                _Dictionary.Add(key, value);
+            lock (_padlock)
+                _dictionary.Add(key, value);
         }
 
         public TKey[] Keys()
         {
-            lock (_Padlock)
+            lock (_padlock)
             {
-                TKey[] keys = new TKey[_Dictionary.Keys.Count];
-                _Dictionary.Keys.CopyTo(keys, 0);
+                var keys = new TKey[_dictionary.Keys.Count];
+                _dictionary.Keys.CopyTo(keys, 0);
                 return keys;
             }
         }
 
         public bool Remove(TKey key)
         {
-            lock (_Padlock)
-                return _Dictionary.Remove(key);
+            lock (_padlock)
+                return _dictionary.Remove(key);
         }
     }
 

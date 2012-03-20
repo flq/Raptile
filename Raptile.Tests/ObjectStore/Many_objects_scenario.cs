@@ -23,6 +23,8 @@ namespace Raptile.Tests.ObjectStore
                 _store.Set(i.ToString(), new Foo {Name = Path.GetRandomFileName()});
 
             _store.Set("54321", new Foo { Name = "Arthur" });
+
+            _store = ReloadObjectStore();
         }
 
         [Test]

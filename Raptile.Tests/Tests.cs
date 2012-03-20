@@ -6,7 +6,6 @@ using NUnit.Framework;
 using OpenFileSystem.IO;
 using OpenFileSystem.IO.FileSystems.InMemory;
 using System.Threading;
-using Raptile;
 
 namespace Raptile.Tests
 {
@@ -18,10 +17,15 @@ namespace Raptile.Tests
 
         private readonly IFileSystem _fileSystem = new InMemoryFileSystem();
 
+        private KeyStore<Guid> GetDB(string name)
+        {
+            return new KeyStore<Guid>(_fileSystem, new Settings(name));
+        }
+
         [Test]
         public void Enumerate()
         {
-            var db = new KeyStore<Guid>(_fileSystem, new Path("raptile.db"));
+            KeyStore<Guid> db = GetDB("raptile.db");
             var sk = Guid.NewGuid();
 
             db.Set(sk, "find key");
@@ -67,7 +71,7 @@ namespace Raptile.Tests
         public void Multithread_test()
         {
             //  write this test -> 2 write threads , 1 read thread after 5 sec delay
-            var db = new KeyStore<Guid>(_fileSystem, new Path("multithread"));
+            var db = GetDB("multithread");
 
             DateTime dt = DateTime.Now;
             threadtest(db);
@@ -137,7 +141,7 @@ namespace Raptile.Tests
         private void set_get(string fname, int count, bool shutdown, bool skiplist)
         {
             Console.WriteLine("One million test on ");
-            var db = new KeyStore<Guid>(_fileSystem, new Path(fname));
+            var db = GetDB(fname);
 
             var guids = new List<Guid>();
             if (skiplist == false)
@@ -182,7 +186,7 @@ namespace Raptile.Tests
             if (shutdown)
             {
                 db.Dispose();
-                db = new KeyStore<Guid>(_fileSystem, new Path(fname));
+                db = GetDB(fname);
             }
             GC.Collect(2);
             int notfound = 0;
@@ -222,7 +226,7 @@ namespace Raptile.Tests
         [Test]
         public void RemoveKeyTest()
         {
-            var path = new Path("remove.dat");
+            var path = new Settings("remove.dat");
             var rdb = new KeyStore<long>(_fileSystem, path);
             rdb.Set(1, "a");
             rdb.Set(2, "b");
@@ -244,7 +248,7 @@ namespace Raptile.Tests
         [Test]
         public void StringKeyTest()
         {
-            var db = new KeyStore<string>(_fileSystem, new Path("strings"));
+            var db = new KeyStore<string>(_fileSystem, new Settings("strings1"));
             for (var i = 0; i < 100000; i++)
             {
                 db.Set("asdfasd" + i, "" + i);
@@ -256,7 +260,7 @@ namespace Raptile.Tests
         public void string_test()
         {
             Debug.WriteLine("unlimited key size test");
-            var rap = new RaptileDBString(_fileSystem, "longstringkey", false);
+            var rap = new RaptileDBString(_fileSystem, new Settings("strings2"));
             Debug.WriteLine("inserting 10000 ...");
             for (int i = 0; i < 10000; i++)
             {

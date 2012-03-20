@@ -8,7 +8,7 @@
         {
             DiskPageNumber = -1;
             RightPageNumber = -1;
-            _tree = new SafeDictionary<T, KeyInfo>(Global.PageItemCount);
+            _tree = new SafeDictionary<T, KeyInfo>(Defaults.PageItemCount);
             isDirty = false;
             FirstKey = default(T);
         }

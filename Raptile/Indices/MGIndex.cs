@@ -63,7 +63,7 @@ namespace Raptile.Indices
                 page.Tree.Add(key, ki);
             }
 
-            if (page.Tree.Count > Global.PageItemCount)
+            if (page.Tree.Count > Defaults.PageItemCount)
                 SplitPage(page);
 
             _lastIndexedRecordNumber = recordNumber;

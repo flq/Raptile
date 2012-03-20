@@ -4,7 +4,6 @@ using OpenFileSystem.IO;
 using OpenFileSystem.IO.FileSystems.InMemory;
 using FluentAssertions;
 using System.Linq;
-using Raptile;
 
 namespace Raptile.Tests
 {
@@ -18,7 +17,7 @@ namespace Raptile.Tests
         public void Given()
         {
             _fs = new InMemoryFileSystem();
-            var ks = new KeyStore<string>(_fs, new Path(@"c:\db\raptile.db"));
+            var ks = new KeyStore<string>(_fs, new Settings(@"c:\db\raptile.db"));
             ks.Dispose();
             _dir = _fs.GetDirectory(@"c:\db");
         }

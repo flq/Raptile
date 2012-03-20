@@ -14,19 +14,19 @@ namespace Raptile
             set { fileSystem = value; }
         }
 
-        public static IRaptileDB<T> Open<T>(string filename) where T : IComparable<T>
+        public static IRaptileDB<T> Open<T>(Settings settings) where T : IComparable<T>
         {
             if (typeof(T).Equals(typeof(string)))
-                return (IRaptileDB<T>)new RaptileDBString(FileSystem, filename, true);
+                return (IRaptileDB<T>)new RaptileDBString(FileSystem, settings);
             if (typeof(T).Equals(typeof(Guid)))
-                return (IRaptileDB<T>)new RaptileDBGuid(FileSystem, filename);
-            return new KeyStore<T>(FileSystem, new Path(filename));
+                return (IRaptileDB<T>)new RaptileDBGuid(FileSystem, settings);
+            return new KeyStore<T>(FileSystem, settings);
         }
 
-        public static IObjectStore<T> Open<T>(string filename, ISerializer serializer) where T : IComparable<T>
+        public static IObjectStore<T> OpenObjectStore<T>(Settings settings) where T : IComparable<T>
         {
-            var db = Open<T>(filename);
-            return new ObjectStore<T>(db, serializer);
+            var db = Open<T>(settings);
+            return new ObjectStore<T>(db, settings);
         }
     }
 }

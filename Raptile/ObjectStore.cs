@@ -20,10 +20,10 @@ namespace Raptile
         private readonly IRaptileDB<K> _db;
         private readonly ISerializer _serializer;
 
-        public ObjectStore(IRaptileDB<K> db, ISerializer serializer)
+        public ObjectStore(IRaptileDB<K> db, Settings settings)
         {
             _db = db;
-            _serializer = serializer;
+            _serializer = settings.Serializer;
         }
 
         public T Get<T>(K key)

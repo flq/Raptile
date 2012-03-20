@@ -106,7 +106,7 @@ namespace Raptile.Storage
             {
                 // write data block
                 _writefile.Write(data, 0, data.Length);
-                if (Global.FlushStorageFileImmediatly)
+                if (Defaults.FlushStorageFileImmediatly)
                     _writefile.Flush();
                 _lastWriteOffset += data.Length;
             }
@@ -116,7 +116,7 @@ namespace Raptile.Storage
             var recno = _lastRecordNum;
             Interlocked.Increment(ref _lastRecordNum);
             _recordfile.Write(Converter.GetBytes(offset, false), 0, 8);
-            if (Global.FlushStorageFileImmediatly)
+            if (Defaults.FlushStorageFileImmediatly)
                 _recordfile.Flush();
             _flushNeeded = true;
             return recno;

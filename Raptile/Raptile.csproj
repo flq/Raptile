@@ -110,8 +110,9 @@
     <Compile Include="DataTypes\StringHandler.cs" />
     <Compile Include="DataTypes\UintHandler.cs" />
     <Compile Include="DbFiles.cs" />
-    <Compile Include="Global.cs" />
+    <Compile Include="Defaults.cs" />
     <Compile Include="Converter.cs" />
+    <Compile Include="DefaultSerializer.cs" />
     <Compile Include="Indices\IndexFile.cs" />
     <Compile Include="Indices\KeyInfo.cs" />
     <Compile Include="Indices\MGIndex.cs" />

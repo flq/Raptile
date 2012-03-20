@@ -17,19 +17,15 @@ namespace Raptile
         private readonly System.Timers.Timer _savetimer;
         private readonly object _lock = new object();
 
-        public KeyStore(IFileSystem fileSystem, Path file) : this(fileSystem, file, Global.DefaultStringKeySize)
-        {
-            
-        }
-
-        public KeyStore(IFileSystem fileSystem, Path file, byte maxKeySize)
+        public KeyStore(IFileSystem fileSystem, Settings settings)
         {   
-            _maxKeySize = RdbDataType<T>.GetByteSize(maxKeySize);
+            _maxKeySize = RdbDataType<T>.GetByteSize(settings.DefaultStringKeySize);
+            var file = settings.DbFileName;
 
             var dbFile = file.ChangeExtension(DbFiles.DatExtension);
             var recFile = file.ChangeExtension(DbFiles.RecExtension);
 
-            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Global.PageItemCount);
+            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Defaults.PageItemCount);
 
             _storageFile = new StorageFile<T>(fileSystem.GetFile(dbFile), fileSystem.GetFile(recFile), _maxKeySize);
 
@@ -40,7 +36,7 @@ namespace Raptile
             _log.Debug("Starting save timer");
             _savetimer = new System.Timers.Timer();
             _savetimer.Elapsed += HandleSavetimerElapsed;
-            _savetimer.Interval = Global.SaveTimerSeconds * 1000;
+            _savetimer.Interval = Defaults.SaveTimerSeconds * 1000;
             _savetimer.AutoReset = true;
             _savetimer.Start();
         }

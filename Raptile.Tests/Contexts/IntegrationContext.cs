@@ -6,19 +6,28 @@ namespace Raptile.Tests
 {
     public class IntegrationContext
     {
+        private string _lastFileName;
+        private IObjectStore<string> _lastObjectStore;
         protected IFileSystem Fs { get; private set; }
 
         public IntegrationContext()
         {
-            Global.PageItemCount = 1000;
+            Defaults.PageItemCount = 1000;
             Fs = new InMemoryFileSystem();
             Raptile.FileSystem = Fs;
         }
 
-        protected IObjectStore<string> NewObjectStore()
+        protected IObjectStore<string> ReloadObjectStore()
         {
-            var f = Path.GetRandomFileName();
-            return Raptile.Open<string>(f, new ServiceStackSerializer());
+            _lastObjectStore.Dispose();
+            return NewObjectStore(_lastFileName);
+        }
+
+        protected IObjectStore<string> NewObjectStore(string fileName = null)
+        {
+            _lastFileName = fileName ?? Path.GetRandomFileName();
+            _lastObjectStore = Raptile.OpenObjectStore<string>(new Settings(_lastFileName) { Serializer = new ServiceStackSerializer() });
+            return _lastObjectStore;
         }
     }
 }

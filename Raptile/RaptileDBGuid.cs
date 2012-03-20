@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using OpenFileSystem.IO;
-using Path = OpenFileSystem.IO.Path;
 
 namespace Raptile
 {
@@ -9,9 +8,9 @@ namespace Raptile
     {
         private readonly KeyStore<int> _db;
 
-        public RaptileDBGuid(IFileSystem fileSystem, string filename)
+        public RaptileDBGuid(IFileSystem fileSystem, Settings settings)
         {
-            _db = new KeyStore<int>(fileSystem, new Path(filename));
+            _db = new KeyStore<int>(fileSystem, settings);
         }
 
         public void Set(Guid key, byte[] val)

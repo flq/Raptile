@@ -1,21 +1,17 @@
 ﻿using System.IO;
 using System.Text;
 using OpenFileSystem.IO;
-using Path = OpenFileSystem.IO.Path;
 
 namespace Raptile
 {
     internal class RaptileDBString : IRaptileDB<string>
     {
-        readonly bool _caseSensitive;
         private readonly KeyStore<int> _db;
 
-        public RaptileDBString(IFileSystem fileSystem, string filename, bool caseSensitive)
+        public RaptileDBString(IFileSystem fileSystem, Settings settings)
         {
-            _db = new KeyStore<int>(fileSystem, new Path(filename));
-            _caseSensitive = caseSensitive;
+            _db = new KeyStore<int>(fileSystem, settings);
         }
-
 
         public void Set(string key, string val)
         {
@@ -24,8 +20,7 @@ namespace Raptile
 
         public void Set(string key, byte[] val)
         {
-            string str = (_caseSensitive ? key : key.ToLower());
-            byte[] bkey = Encoding.Unicode.GetBytes(str);
+            byte[] bkey = Encoding.Unicode.GetBytes(key);
             var hc = (int)Converter.MurMur.Hash(bkey);
             var ms = new MemoryStream();
             ms.Write(Converter.GetBytes(bkey.Length, false), 0, 4);
@@ -75,10 +70,9 @@ namespace Raptile
             _db.Dispose();
         }
 
-        private int GetKeyHash(string key)
+        private static int GetKeyHash(string key)
         {
-            string str = (_caseSensitive ? key : key.ToLower());
-            byte[] bkey = Encoding.Unicode.GetBytes(str);
+            byte[] bkey = Encoding.Unicode.GetBytes(key);
             return (int)Converter.MurMur.Hash(bkey);
         }
     }
