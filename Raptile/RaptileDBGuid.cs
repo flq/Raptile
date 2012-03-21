@@ -4,7 +4,7 @@ using OpenFileSystem.IO;
 
 namespace Raptile
 {
-    internal class RaptileDBGuid : IRaptileDB<Guid>
+    internal class RaptileDBGuid : IRaptileDB<Guid>, IRaptileInternalDB
     {
         private readonly KeyStore<int> _db;
 
@@ -57,6 +57,14 @@ namespace Raptile
         {
             byte[] bkey = key.ToByteArray();
             return (int)Converter.MurMur.Hash(bkey);
+        }
+
+        byte[] IRaptileInternalDB.ReadData(int recordNumber)
+        {
+            byte[] g;
+            var bytes = ((IRaptileInternalDB)_db).ReadData(recordNumber);
+            bytes.UnpackData(out bytes, out g);
+            return bytes;
         }
     }
 }

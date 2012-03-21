@@ -10,6 +10,7 @@ namespace Raptile.Indices
     {
         void Inspect(int recordNumber, object obj);
         void Remove(int recordNumber);
+        string IndexName { get; }
     }
 
     public class SecondaryIndex<T> : SecondaryIndex
@@ -71,6 +72,11 @@ namespace Raptile.Indices
         public void Remove(int recordNumber)
         {
             _storage.Remove(recordNumber);
+        }
+
+        public string IndexName
+        {
+            get { return _indexName; }
         }
 
         public IEnumerator<int> GetEnumerator()

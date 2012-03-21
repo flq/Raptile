@@ -9,4 +9,9 @@ namespace Raptile
         bool Remove(T key);
         long Count { get; }
     }
+
+    internal interface IRaptileInternalDB
+    {
+        byte[] ReadData(int recordNumber);
+    }
 }

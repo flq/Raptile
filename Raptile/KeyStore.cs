@@ -7,7 +7,7 @@ using Raptile.Storage;
 
 namespace Raptile
 {
-    internal class KeyStore<T> : IRaptileDB<T> where T : IComparable<T>
+    internal class KeyStore<T> : IRaptileDB<T>, IRaptileInternalDB where T : IComparable<T>
     {
         private readonly ILog _log = LogManager.GetLogger(typeof(KeyStore<T>));
         private readonly byte _maxKeySize;
@@ -161,6 +161,11 @@ namespace Raptile
         void HandleSavetimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             _index.SaveIndex();
+        }
+
+        byte[] IRaptileInternalDB.ReadData(int recordNumber)
+        {
+            return _storageFile.ReadData(recordNumber);
         }
     }
 }

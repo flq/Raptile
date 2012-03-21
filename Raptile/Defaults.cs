@@ -1,4 +1,5 @@
 ﻿using System;
+using Raptile.Indices;
 using Path = OpenFileSystem.IO.Path;
 
 namespace Raptile
@@ -14,6 +15,8 @@ namespace Raptile
     public class Settings
     {
         private ISerializer _serializer;
+
+        private readonly SecondaryIndexContainer _indices = new SecondaryIndexContainer();
 
         public Settings(string dbFilename)
         {
@@ -34,6 +37,18 @@ namespace Raptile
         {
             get { return _serializer?? (_serializer = new DefaultSerializer()); }
             set { _serializer = value; }
+        }
+
+        public SecondaryIndexContainer Indices
+        {
+            get { return _indices; }
+        }
+
+        public void AddIndex<T>(string indexName, Func<T, bool> indexer)
+        {
+            var secondaryIndex = new SecondaryIndex<T>(indexName, indexer);
+            secondaryIndex.SetUp(Raptile.FileSystem, this);
+            _indices.AddIndex(secondaryIndex);
         }
     }
 }

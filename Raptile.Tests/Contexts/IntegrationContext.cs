@@ -1,3 +1,4 @@
+using System;
 using OpenFileSystem.IO;
 using OpenFileSystem.IO.FileSystems.InMemory;
 using Path = System.IO.Path;
@@ -23,10 +24,13 @@ namespace Raptile.Tests
             return NewObjectStore(_lastFileName);
         }
 
-        protected IObjectStore<string> NewObjectStore(string fileName = null)
+        protected IObjectStore<string> NewObjectStore(string fileName = null, Action<Settings> modifySettings = null)
         {
             _lastFileName = fileName ?? Path.GetRandomFileName();
-            _lastObjectStore = Raptile.OpenObjectStore<string>(new Settings(_lastFileName) { Serializer = new ServiceStackSerializer() });
+            var settings = new Settings(_lastFileName) { Serializer = new ServiceStackSerializer() };
+            if (modifySettings != null)
+                modifySettings(settings);
+            _lastObjectStore = Raptile.OpenObjectStore<string>(settings);
             return _lastObjectStore;
         }
     }

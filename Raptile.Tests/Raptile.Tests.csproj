@@ -74,6 +74,7 @@
     <Compile Include="Contexts\ServiceStackSerializer.cs" />
     <Compile Include="Index\Index_file_basic_usage.cs" />
     <Compile Include="ObjectStore\Many_objects_scenario.cs" />
+    <Compile Include="ObjectStore\ObjectStore_with_secondary_index.cs" />
     <Compile Include="Storage\long_storage_key.cs" />
     <Compile Include="MurmurHashTests.cs" />
     <Compile Include="Contexts\StorageFileTestContext.cs" />

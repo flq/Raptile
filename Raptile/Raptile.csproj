@@ -124,10 +124,12 @@
     <Compile Include="Indices\Page.cs" />
     <Compile Include="Indices\PageInfo.cs" />
     <Compile Include="Indices\SecondaryIndex.cs" />
+    <Compile Include="Indices\SecondaryIndexContainer.cs" />
     <Compile Include="IRaptileDB.cs" />
     <Compile Include="KeyStore.cs" />
     <Compile Include="KeyStoreExtensions.cs" />
     <Compile Include="Logging.cs" />
+    <Compile Include="Experimental\LoopScheduler.cs" />
     <Compile Include="ObjectStore.cs" />
     <Compile Include="Raptile.cs" />
     <Compile Include="RaptileDBGuid.cs" />
