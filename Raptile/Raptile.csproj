@@ -94,9 +94,13 @@
     <Reference Include="OpenFileSystem">
       <HintPath>..\lib\OpenFileSystem.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.480\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -119,6 +123,7 @@
     <Compile Include="Indices\MurMurHash2.cs" />
     <Compile Include="Indices\Page.cs" />
     <Compile Include="Indices\PageInfo.cs" />
+    <Compile Include="Indices\SecondaryIndex.cs" />
     <Compile Include="IRaptileDB.cs" />
     <Compile Include="KeyStore.cs" />
     <Compile Include="KeyStoreExtensions.cs" />
@@ -164,6 +169,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="Costura.EmbedTask" AssemblyFile="$(SolutionDir)lib\Costura.dll" />

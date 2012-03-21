@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Raptile.Indices;
 
 namespace Raptile
 {
@@ -29,6 +30,12 @@ namespace Raptile
         internal static void Set<T>(this KeyStore<T> store, T key, string data) where T : IComparable<T>
         {
             store.Set(key, Encoding.Unicode.GetBytes(data));
+        }
+
+        internal static int Hash(this MurmurHash2Unsafe hasher, string value)
+        {
+            byte[] bkey = Encoding.Unicode.GetBytes(value);
+            return (int)Converter.MurMur.Hash(bkey);
         }
 
         internal static bool UnpackData(this byte[] buffer, out byte[] val, out byte[] key)

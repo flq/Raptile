@@ -9,6 +9,7 @@ namespace Raptile
         public const string RecExtension = ".mgrec";
         public const string BitmapRecExtension = ".mgbmr";
         public const string BitmapExtension = ".mgbmp";
+        public const string SecondaryIndexExtension = ".secidx";
 
         public static Path ChangeExtension(this Path file, string extension)
         {
