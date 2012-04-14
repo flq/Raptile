@@ -25,9 +25,8 @@ namespace Raptile
             var dbFile = file.ChangeExtension(DbFiles.DatExtension);
             var recFile = file.ChangeExtension(DbFiles.RecExtension);
 
-            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Defaults.PageItemCount);
-
             _storageFile = new StorageFile<T>(fileSystem.GetFile(dbFile), fileSystem.GetFile(recFile), _maxKeySize);
+            _index = new MGIndex<T>(fileSystem, file.ChangeExtension(DbFiles.IdxExtension), _maxKeySize, Defaults.PageItemCount);
 
             _log.Debug("Current Count = " + Count.ToString("#,0"));
 

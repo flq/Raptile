@@ -65,8 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contexts\SecondaryIndexContext.cs" />
-    <Compile Include="Index\Secondary_index_test.cs" />
-    <Compile Include="Index\Typed_secondary_index_test.cs" />
+    <Compile Include="Index\IndexExtractionTests.cs" />
+    <Compile Include="Index\Named_group_test.cs" />
+    <Compile Include="Index\Typed_named_group_test.cs" />
     <Compile Include="ObjectStore\Basic_objectstore_usage.cs" />
     <Compile Include="Contexts\Foo.cs" />
     <Compile Include="Contexts\IndexFileTestContext.cs" />

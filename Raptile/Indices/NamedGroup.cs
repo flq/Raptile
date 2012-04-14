@@ -13,22 +13,22 @@ namespace Raptile.Indices
         string IndexName { get; }
     }
 
-    public class SecondaryIndex<T> : SecondaryIndex
+    public class NamedGroup<T> : NamedGroup
     {
         /// <summary>
         /// Use if you just want an index on type
         /// </summary>
-        public SecondaryIndex(string indexName) : this(indexName, _ => true)
+        public NamedGroup(string indexName) : this(indexName, _ => true)
         {
             
         }
 
-        public SecondaryIndex(string indexName, Func<T, bool> predicate) : base(indexName, o => o is T && predicate((T)o))
+        public NamedGroup(string indexName, Func<T, bool> predicate) : base(indexName, o => o is T && predicate((T)o))
         {
         }
     }
 
-    public class SecondaryIndex : ISecondaryIndex
+    public class NamedGroup : ISecondaryIndex
     {
         private readonly string _indexName;
         private readonly Func<object, bool> _predicate;
@@ -57,7 +57,7 @@ namespace Raptile.Indices
             }
         }
 
-        public SecondaryIndex(string indexName, Func<object, bool> predicate)
+        public NamedGroup(string indexName, Func<object, bool> predicate)
         {
             _indexName = indexName;
             _predicate = predicate;

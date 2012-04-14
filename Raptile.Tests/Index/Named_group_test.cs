@@ -6,7 +6,7 @@ using FluentAssertions;
 namespace Raptile.Tests.Index
 {
     [TestFixture]
-    public class Secondary_index_test : SecondaryIndexContext
+    public class Named_group_test : SecondaryIndexContext
     {
         private void CreateIndex()
         {

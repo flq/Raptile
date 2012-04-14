@@ -7,7 +7,7 @@ using System.Linq;
 namespace Raptile.Tests.Index
 {
     [TestFixture]
-    public class Typed_secondary_index_test : SecondaryIndexContext
+    public class Typed_named_group_test : SecondaryIndexContext
     {
         [TestFixtureSetUp]
         public void Given()

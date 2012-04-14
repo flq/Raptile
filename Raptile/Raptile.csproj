@@ -123,7 +123,7 @@
     <Compile Include="Indices\MurMurHash2.cs" />
     <Compile Include="Indices\Page.cs" />
     <Compile Include="Indices\PageInfo.cs" />
-    <Compile Include="Indices\SecondaryIndex.cs" />
+    <Compile Include="Indices\NamedGroup.cs" />
     <Compile Include="Indices\SecondaryIndexContainer.cs" />
     <Compile Include="IRaptileDB.cs" />
     <Compile Include="KeyStore.cs" />

@@ -12,7 +12,18 @@ namespace Raptile.Tests.ObjectStore
         [TestFixtureSetUp]
         public void Given()
         {
-            _store = NewObjectStore(modifySettings: s => s.AddIndex<Foo>("FoosWithB", f => f.Name.StartsWith("B")));
+            _store = NewObjectStore(modifySettings: s => s.AddNamedGroup<Foo>("FoosWithB", f => f.Name.StartsWith("B")));
+
+            //var idx = _store.Enumerate<Foo>("x").Select(f => new { f.Name, f.Period });
+
+            //_store.AddIndex(idx);
+
+            //
+            //_store.Get<Foo>(f => f.Name == "Bla" && f.Period = new Period());
+
+            //var foos = _store.GetFoos() <- Extension method
+            //var foos = _store.GetFoos("Gustav") <- Extension method
+
             _store.Set("123", new Foo { Name = "Belzebub"});
             _store.Set("100", new Foo { Name = "Aaron" });
         }

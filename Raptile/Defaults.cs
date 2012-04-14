@@ -44,9 +44,9 @@ namespace Raptile
             get { return _indices; }
         }
 
-        public void AddIndex<T>(string indexName, Func<T, bool> indexer)
+        public void AddNamedGroup<T>(string indexName, Func<T, bool> indexer)
         {
-            var secondaryIndex = new SecondaryIndex<T>(indexName, indexer);
+            var secondaryIndex = new NamedGroup<T>(indexName, indexer);
             secondaryIndex.SetUp(Raptile.FileSystem, this);
             _indices.AddIndex(secondaryIndex);
         }

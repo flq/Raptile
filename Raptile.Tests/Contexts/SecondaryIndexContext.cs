@@ -14,13 +14,13 @@ namespace Raptile.Tests
 
         protected void LoadIndex(string name, Func<object,bool> indexer)
         {
-            _secIndexBuilder = () => new SecondaryIndex(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
-            Index = new SecondaryIndex(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
+            _secIndexBuilder = () => new NamedGroup(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
+            Index = new NamedGroup(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
         }
 
         protected void LoadIndex<T>(string name, Func<T, bool> indexer)
         {
-            _secIndexBuilder = () => new SecondaryIndex<T>(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
+            _secIndexBuilder = () => new NamedGroup<T>(name, indexer).SetUp(Fs, new Settings(@"c:\db\."));
             Index = _secIndexBuilder();
         }
 
