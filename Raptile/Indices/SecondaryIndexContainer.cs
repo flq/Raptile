@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Raptile.Indices
 {
@@ -44,6 +46,19 @@ namespace Raptile.Indices
         public string IndexName
         {
             get { return "Contains " + string.Join(", ", _indices.Keys); }
+        }
+
+        public bool SupportsSearch
+        {
+            get { return _indices.Values.Any(idx => idx.SupportsSearch); }
+        }
+
+        public int? Find<T>(Expression<Func<object>> query)
+        {
+            return _indices.Values
+                .Where(idx => idx.SupportsSearch)
+                .Select(idx => idx.Find<T>(query))
+                .FirstOrDefault(i => i.HasValue);
         }
 
         public IEnumerable<int> Enumerate(string indexName)

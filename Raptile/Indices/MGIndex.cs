@@ -106,7 +106,7 @@ namespace Raptile.Indices
             _index.Dispose();
         }
 
-        public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey)
+        public IEnumerable<KeyValuePair<T, int>> Enumerate(T fromkey = default(T))
         {
             var list = new List<KeyValuePair<T, int>>();
             // enumerate
@@ -115,7 +115,7 @@ namespace Raptile.Indices
             T[] keys = page.Tree.Keys();
             Array.Sort(keys);
 
-            int p = Array.BinarySearch(keys, fromkey);
+            int p = !Equals(fromkey, default(T)) ? Array.BinarySearch(keys, fromkey) : 0;
             for (int i = p; i < keys.Length; i++)
                 list.Add(new KeyValuePair<T, int>(keys[i], page.Tree[keys[i]].RecordNumber));
 

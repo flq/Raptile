@@ -17,5 +17,11 @@ namespace Raptile
             var fullFileName = System.IO.Path.GetFileNameWithoutExtension(file) + extension;
             return !string.IsNullOrEmpty(path) ? new Path(path).Combine(fullFileName) : new Path(fullFileName);
         }
+
+        public static Path NewFileInThisDir(this Path file, string name)
+        {
+            var path = file.DirectoryName;
+            return new Path(path).Combine(name);;
+        }
     }
 }

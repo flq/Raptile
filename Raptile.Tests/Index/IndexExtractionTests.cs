@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using FluentAssertions;
+using Raptile.Indices;
 
 namespace Raptile.Tests.Index
 {
@@ -38,29 +39,6 @@ namespace Raptile.Tests.Index
         private IndexExtractor<T> GetExtractor<T>(Expression<Func<T, object>> def)
         {
             return new IndexExtractor<T>(def);
-        }
-    }
-
-    public class IndexExtractor<T>
-    {
-        private Func<T, object> _extractor;
-
-        public IndexExtractor(Expression<Func<T, object>> definition)
-        {
-            Translate(definition);
-        }
-
-        private void Translate(Expression<Func<T, object>> definition)
-        {
-            _extractor = definition.Compile();
-        }
-
-        public string Read(object obj)
-        {
-            if (!(obj is T))
-                return null;
-            var o = _extractor((T)obj);
-            return o.ToString();
         }
     }
 }

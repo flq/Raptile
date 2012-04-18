@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using OpenFileSystem.IO;
 using ProtoBuf;
 
@@ -11,6 +12,12 @@ namespace Raptile.Indices
         void Inspect(int recordNumber, object obj);
         void Remove(int recordNumber);
         string IndexName { get; }
+        bool SupportsSearch { get; }
+        
+        /// <summary>
+        /// Returns the record number associated with a successful hit, otherwise returns null
+        /// </summary>
+        int? Find<T>(Expression<Func<object>> query);
     }
 
     public class NamedGroup<T> : NamedGroup
@@ -77,6 +84,16 @@ namespace Raptile.Indices
         public string IndexName
         {
             get { return _indexName; }
+        }
+
+        public bool SupportsSearch
+        {
+            get { return false; }
+        }
+
+        public int? Find<T>(Expression<Func<object>> query)
+        {
+            return null;
         }
 
         public IEnumerator<int> GetEnumerator()

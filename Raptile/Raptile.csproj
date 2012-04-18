@@ -117,6 +117,7 @@
     <Compile Include="Defaults.cs" />
     <Compile Include="Converter.cs" />
     <Compile Include="DefaultSerializer.cs" />
+    <Compile Include="Indices\IndexExtractor.cs" />
     <Compile Include="Indices\IndexFile.cs" />
     <Compile Include="Indices\KeyInfo.cs" />
     <Compile Include="Indices\MGIndex.cs" />
