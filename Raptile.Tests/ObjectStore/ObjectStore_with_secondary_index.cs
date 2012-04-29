@@ -1,6 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
+using System;
 
 namespace Raptile.Tests.ObjectStore
 {
@@ -12,20 +13,13 @@ namespace Raptile.Tests.ObjectStore
         [TestFixtureSetUp]
         public void Given()
         {
-            _store = NewObjectStore(modifySettings: s => s.AddNamedGroup<Foo>("FoosWithB", f => f.Name.StartsWith("B")));
-
-            //var idx = _store.Enumerate<Foo>("x").Select(f => new { f.Name, f.Period });
-
-            //_store.AddIndex(idx);
-
-            //
-            //_store.Get<Foo>(f => f.Name == "Bla" && f.Period = new Period());
-
-            //var foos = _store.GetFoos() <- Extension method
-            //var foos = _store.GetFoos("Gustav") <- Extension method
+            _store = NewObjectStore(modifySettings: s => { 
+                s.AddNamedGroup<Foo>("FoosWithB", f => f.Name.StartsWith("B"));
+                s.AddPropertyIndex<Foo>("name", f => new { f.Name });
+            });
 
             _store.Set("123", new Foo { Name = "Belzebub"});
-            _store.Set("100", new Foo { Name = "Aaron" });
+            _store.Set("100", new Foo { Name = "Aaron", Time = new DateTime(2011,6,6)  });
         }
 
         [Test]
@@ -36,6 +30,14 @@ namespace Raptile.Tests.ObjectStore
             var foos = _store.Enumerate<Foo>("FoosWithB").ToList();
             foos.Should().HaveCount(1);
             foos[0].Name.Should().Be(f1.Name);
+        }
+
+        [Test]
+        public void retrieval_through_indexed_property()
+        {
+            var f1 = _store.Get<Foo>(() => new { Name = "Aaron" });
+            f1.Should().NotBeNull();
+            f1.Time.Should().Be(new DateTime(2011, 6, 6));
         }
     }
 }

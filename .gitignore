@@ -10,10 +10,8 @@ _ReSharper.*
 *.suo
 *.cache
 *.~
-MemBus_mm_cache.bin
+TestResults
 packages
-Nuget/MemBus/lib
-Nuget/MemBus/readme.md
 *.swp
 *.nupkg
 readme.html

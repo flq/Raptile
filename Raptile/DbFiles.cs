@@ -21,7 +21,9 @@ namespace Raptile
         public static Path NewFileInThisDir(this Path file, string name)
         {
             var path = file.DirectoryName;
-            return new Path(path).Combine(name);;
+            if (string.IsNullOrEmpty(path))
+                return new Path(name);
+            return new Path(path).Combine(name);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Raptile.Tests
         {
             Defaults.PageItemCount = 1000;
             Fs = new InMemoryFileSystem();
-            Raptile.FileSystem = Fs;
+            Settings.FileSystem = Fs;
         }
 
         protected IObjectStore<string> ReloadObjectStore()

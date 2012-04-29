@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq.Expressions;
+using OpenFileSystem.IO;
+using OpenFileSystem.IO.FileSystems.Local.Win32;
 using Raptile.Indices;
 using Path = OpenFileSystem.IO.Path;
 
@@ -17,6 +20,14 @@ namespace Raptile
         private ISerializer _serializer;
 
         private readonly SecondaryIndexContainer _indices = new SecondaryIndexContainer();
+
+        private static IFileSystem fileSystem = new Win32FileSystem();
+        
+        public static IFileSystem FileSystem
+        {
+            get { return fileSystem; }
+            set { fileSystem = value; }
+        }
 
         public Settings(string dbFilename)
         {
@@ -47,8 +58,14 @@ namespace Raptile
         public void AddNamedGroup<T>(string indexName, Func<T, bool> indexer)
         {
             var secondaryIndex = new NamedGroup<T>(indexName, indexer);
-            secondaryIndex.SetUp(Raptile.FileSystem, this);
+            secondaryIndex.SetUp(FileSystem, this);
             _indices.AddIndex(secondaryIndex);
+        }
+
+        public void AddPropertyIndex<T>(string indexName, Expression<Func<T,object>> indexer)
+        {
+            var secondary = new PropertyIndex<T>(FileSystem, DbFileName.NewFileInThisDir(indexName + ".secidx"), indexName, indexer);
+            _indices.AddIndex(secondary);
         }
     }
 }

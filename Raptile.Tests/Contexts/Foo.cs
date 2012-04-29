@@ -8,4 +8,11 @@ namespace Raptile.Tests
 
         public DateTime Time { get; set; }
     }
+
+    public class Bar
+    {
+        public string Name { get; set; }
+
+        public DateTime Time { get; set; }
+    }
 }
